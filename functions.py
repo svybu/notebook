@@ -1,5 +1,5 @@
 from classes import Note, df
-
+from decorator import input_error
 """*****************основна логіка роботи та функції*****************"""
 
 
@@ -23,30 +23,39 @@ def parser_string(u_input):
         handler = OPTIONS.get(command.lower(), wrong_command())
     return handler, args
 
-
+@input_error
 def add_note(args):
     name = args[0]
-    ex_note = Note(name)
-    ex_note.add_note()
-    df.to_csv('df.csv', index=False, sep=';')
+    if df['name'].isin([name]).any():
+        raise FileExistsError
+    else:
+        ex_note = Note(name)
+        ex_note.add_note()
+        df.to_csv('df.csv', index=False, sep=';')
     return f'{ex_note.name.value} added'
 
-
+@input_error
 def change_note(args):
     name = args[0]
-    ex_note = Note(name)
-    ex_note.change_note()
-    df.to_csv('df.csv', index=False, sep=';')
-    return f'{ex_note.name.value} changed'
+    if df['name'].isin([name]).any() == False:
+        raise FileNotFoundError
+    else:
+        ex_note = Note(name)
+        ex_note.change_note()
+        df.to_csv('df.csv', index=False, sep=';')
+        return f'{ex_note.name.value} changed'
 
-
+@input_error
 def remove_note(args):
     global df
     name = args[0]
-    ex_note = Note(name)
-    df = ex_note.remove()
-    df.to_csv('df.csv', index=False, sep=';')
-    return f'{ex_note.name.value} removed'
+    if df['name'].isin([name]).any() == False:
+        raise FileNotFoundError
+    else:
+        ex_note = Note(name)
+        df = ex_note.remove()
+        df.to_csv('df.csv', index=False, sep=';')
+        return f'{ex_note.name.value} removed'
 
 
 def show_all(a):

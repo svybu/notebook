@@ -90,3 +90,6 @@ class Note():
         os.remove(f'.//notes//{self.name.value}.txt')
         df = df.loc[df['name'] != self.name.value]
         return df
+
+
+print(df.sort_values(by='changed'))

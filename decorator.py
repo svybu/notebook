@@ -12,5 +12,9 @@ def input_error(func):
             return "Sorry, I didn't understand this command, please try again"
         except AttributeError as exception:
             return "Sorry, no such attribute("
+        except FileExistsError:
+            return 'note with this name  already exists'
+        except FileNotFoundError:
+            return 'there is no note with this name'
 
     return inner
