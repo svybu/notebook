@@ -7,7 +7,7 @@ def input_error(func):
         except ValueError as exception:
             return exception.args[0]
         except IndexError:
-            return 'This contact exists already, try again'
+            return 'Seems, some mistake. Please, try again'
         except TypeError as exception:
             return "Sorry, I didn't understand this command, please try again"
         except AttributeError as exception:

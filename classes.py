@@ -1,15 +1,19 @@
 import datetime
+import os
 import subprocess
 from pathlib import Path
 import pandas as pd
-import os
 
 
+def to_memory():
+    df.to_csv('df.csv', index=False, sep=';')
 def create_df():
     try:
         df = pd.read_csv('df.csv', delimiter=';')
     except FileNotFoundError:
-        df = pd.DataFrame(columns=['id', 'tags', 'name', 'created', 'changed'])
+        df = pd.DataFrame(columns=['tags', 'name', 'created', 'changed'])
+    if os.path.exists('notes')==False:
+        os.mkdir('notes')
     return df
 
 
@@ -52,16 +56,21 @@ class Tag(Field):
 
 
 class Note():
-    def __init__(self, name, tags=[], created=datetime.datetime.now().strftime('%m/%d/%Y, %H:%M')):
+    def __init__(self, name, tags='', created=datetime.datetime.now().strftime('%m/%d/%Y, %H:%M')):
         self.name = Name(name)
         self.tags = tags
-        if tags:
-            self.tags.add_tag
         self.created = created
 
-    # @input_error
-    def add_tag(self, tag):
-        self.tag.append(Tag(tag))
+
+    def add_tags(self, new_tag):
+        self.tags = new_tag
+        df.loc[df['name'] == self.name.value, ['tags']] = self.tags
+
+
+
+    def delete_tags(self):
+        self.tags = ''
+        df.loc[df['name'] == self.name.value, ['tags']] = ''
 
     def add_note(self):
         try:
@@ -92,4 +101,17 @@ class Note():
         return df
 
 
-print(df.sort_values(by='changed'))
+
+def synk():
+    global df
+    names = os.listdir('notes')
+    names = [i[:-4] for i in names]
+    for name in names:
+        if df['name'].isin([name]).any()==False:
+            ex_note = Note(name)
+            df.loc[len(df), ['name', 'created']] = [ex_note.name.value, ex_note.created]
+    to_memory()
+    df = df.loc[df['name'].isin(names)==True]
+    to_memory()
+
+synk()
